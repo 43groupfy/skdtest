@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ujian Online</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="step-1" class="step-container login-wrapper">
+        <div class="login-logo">
+            <img src="https://via.placeholder.com/150" alt="Logo Ujian">
+            <h1>ExamSystem</h1>
+            <p>Solusi ujian online modern dan terpercaya.</p>
+        </div>
+
+        <div class="login-box">
+            <h2>Selamat Datang</h2>
+            <p>Silakan isi data diri Anda untuk memulai ujian.</p>
+            
+            <div class="form-group">
+                <label for="student-name">Nama Lengkap</label>
+                <input type="text" id="student-name" placeholder="Masukkan nama Anda" value="Ika Prasasty" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="exam-pin">PIN Ujian</label>
+                <input type="password" id="exam-pin" placeholder="Masukkan PIN" value="12345" required>
+            </div>
+            
+            <p id="login-error" class="error-text hidden">Nama tidak boleh kosong atau PIN salah!</p>
+            <button id="start-btn" onclick="startExamFlow()">Mulai Ujian</button>
+        </div>
+    </div>
+
+    <div id="step-2" class="container step-container hidden">
+        <main class="main-col">
+            <header class="quiz-header">
+                <div class="q-number">Soal No: <span id="current-q-num">1</span>/110 (<span id="q-subject"></span>)</div>
+                <div class="timer">Sisa Waktu: <span id="time-display">100:00</span></div>
+            </header>
+            
+            <div class="question-area">
+                <p id="question-text">Memuat pertanyaan...</p>
+                <div id="options-container" class="options-group">
+                    </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button id="prev-btn" onclick="prevQuestion()">Previous</button>
+                <button id="bookmark-btn" onclick="toggleBookmark()">Bookmark</button>
+                <button id="next-btn" onclick="nextQuestion()">Next</button>
+            </div>
+        </main>
+
+        <aside class="sidebar-col step-container">
+            <div class="nav-header">
+			<h3>Navigasi</h3>
+			<div id="legend" class="legend">
+                <div class="legend-item"><span class="box" style="background: #cbd5e0"></span> Belum dijawab</div>
+                <div class="legend-item"><span class="box" style="background: #28a745"></span> Terjawab</div>
+                <div class="legend-item"><span class="box" style="background: #ffc107"></span> Bookmark</div>
+            </div>
+			<div id="legend2" class="legend hidden">
+                <div class="legend-item"><span class="box" style="background: #28a745"></span> Jawaban Benar</div>
+                <div class="legend-item"><span class="box" style="background: #dc3545"></span> Jawaban Salah</div>            </div>
+			</div>
+
+            <div id="nav-grid" class="nav-grid"></div>
+            
+            <button id="submit-btn" onclick="confirmSubmit()">Submit Ujian</button>
+			<button id="back-btn" class="hidden" onclick="backToResult()">Kembali ke Hasil</button>
+        </aside>
+    </div>
+
+
+
+    <div id="step-3" class="step-container result-box hidden">
+        <h2>HASIL AKHIR</h2>
+        <div class="congrats-box">
+            <h3>Selamat <span id="res-name"></span>! Kamu sudah menyelesaikan ujian dengan baik</h3>
+        </div>
+        
+        <table class="result-table">
+            <thead>
+                <tr>
+                    <th>Mata Pelajaran</th>
+                    <th>Skor Anda</th>
+                    <th>Syarat Minimum</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Tes Wawasan Kebangsaan</td>
+                    <td id="res-twk">0</td>
+                    <td>65</td>
+                </tr>
+                <tr>
+                    <td>Tes Intelegensia Umum</td>
+                    <td id="res-tiu">0</td>
+                    <td>80</td>
+                </tr>
+                <tr>
+                    <td>Tes Karakteristik Pribadi</td>
+                    <td id="res-tkp">0</td>
+                    <td>166</td>
+                </tr>
+                <tr class="total-row">
+                    <td><strong>Total Skor Keseluruhan</strong></td>
+                    <td id="res-total"><strong>0</strong></td>
+                    <td><strong>311</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="status-box">
+            <h3>Status Kelulusan: <span id="res-status"></span></h3>
+        </div>
+        <div class="nav-buttons" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 0px !important">
+            <button id="review-btn" onclick="startReview()" style="background-color: #17a2b8; width: 100%;">Review Jawaban</button>
+            <button id="restart-btn" onclick="restartExam()">Ulangi Ujian</button>
+        </div>
+    </div>
+
+
+	<script src="twk2_db.js"></script>
+	<script src="tiu2_db.js"></script>
+	<script src="tkp2_db.js"></script>
+    <script>
+	// Global State
+	let questions = [];
+	let currentQIndex = 0;
+	let answers = [];
+	let bookmarks = [];
+	let timeLeft = 6000;
+	let timerInterval;
+	let studentName = "";
+	let isReviewMode = false;
+
+	// ==========================================
+	// STEP 1: LOGIKA LANDING PAGE & LOGIN
+	// ==========================================
+
+	function startExamFlow() {
+		const nameInput = document.getElementById('student-name').value;
+		const pinInput = document.getElementById('exam-pin').value;
+		const errorMsg = document.getElementById('login-error');
+		
+		if (nameInput.trim() === "" || pinInput !== "12345") {
+			errorMsg.classList.remove('hidden');
+			return;
+		}
+
+		const confirmStart = confirm(`Halo ${nameInput}, apakah Anda sudah siap memulai ujian? Waktu akan segera berjalan.`);
+		
+		if (confirmStart) {
+			errorMsg.classList.add('hidden');
+			studentName = nameInput;
+			
+			document.getElementById('step-1').classList.add('hidden');
+			document.getElementById('step-2').classList.remove('hidden');
+			
+			initExam();
+		}
+	}
+
+	// ==========================================
+	// STEP 2: LOGIKA PROSES UJIAN (REVISED)
+	// ==========================================
+		function shuffle(array) {
+			for (let i = array.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[array[i], array[j]] = [array[j], array[i]];
+			}
+			return array;
+		}
+
+
+	// ==========================================
+	// STEP 2: LOGIKA PROSES UJIAN
+	// ==========================================
+
+	function getRandomElements(arr, count) {
+		return [...arr].sort(() => 0.5 - Math.random()).slice(0, count);
+	}
+
+	function initExam() {
+        // 1. Definisi Kuota TWK (Total 30)
+        const twkSections = [
+            { data: twk_Nasionalisme, count: 5, label: "Nasionalisme" },
+            { data: twk_Integritas, count: 5, label: "Integritas" },
+            { data: twk_BelaNegara, count: 5, label: "Bela Negara" },
+            { data: twk_Pancasila, count: 3, label: "Pancasila" },
+            { data: twk_Bhineka, count: 3, label: "Bhineka Tunggal Ika" },
+            { data: twk_NKRI, count: 3, label: "NKRI" },
+            { data: twk_UUD1945, count: 3, label: "UUD 1945" },
+            { data: twk_BahasaIndo, count: 3, label: "Bahasa Indonesia" }
+        ];
+
+        // 2. Definisi Kuota TIU (Total 35)
+        const tiuSections = [
+            { data: tiu_Analogis, count: 5, label: "Analogis" },
+            { data: tiu_Silogisme, count: 5, label: "Silogisme" },
+            { data: tiu_Analitis, count: 7, label: "Analitis" },
+            { data: tiu_Deret, count: 5, label: "Deret" },
+            { data: tiu_Numerik, count: 13, label: "Numerik" }
+        ];
+
+        // 3. Definisi Kuota TKP (Total 45)
+        const tkpSections = [
+            { data: tkp_PelayananPublik, count: 8, label: "Pelayanan Publik" },
+            { data: tkp_JejaringKerja, count: 8, label: "Jejaring Kerja" },
+            { data: tkp_SosialBudaya, count: 8, label: "Sosial Budaya" },
+            { data: tkp_TIK, count: 7, label: "TIK" },
+            { data: tkp_Profesionalisme, count: 7, label: "Profesionalisme" },
+            { data: tkp_Antiradikalisme, count: 7, label: "Antiradikalisme" },
+        ];
+
+        // Fungsi pembantu untuk mengambil & melabeli soal
+        const collectSoal = (sections, subjectName) => {
+            let result = [];
+            sections.forEach(sec => {
+                // Ambil sampel acak dari masing-masing kategori
+                const sampled = shuffle([...sec.data]).slice(0, sec.count);
+                // Tempelkan subject dan topik secara otomatis
+                const mapped = sampled.map(q => ({
+                    ...q, 
+                    subject: subjectName,
+                    topic: sec.label 
+                }));
+                result.push(...mapped);
+            });
+            return result;
+        };
+
+        // Gabungkan semua sub-tes
+        const finalTWK = collectSoal(twkSections, 'TWK');
+        const finalTIU = collectSoal(tiuSections, 'TIU');
+        const finalTKP = collectSoal(tkpSections, 'TKP');
+
+        questions = [...finalTWK, ...finalTIU, ...finalTKP];
+        
+        // Reset State Ujian
+        answers = new Array(questions.length).fill(null);
+        bookmarks = new Array(questions.length).fill(false);
+
+        renderNavGrid();
+        showQuestion(0);
+        startTimer();
+    }
+
+	function startReview() {
+		isReviewMode = true;
+		document.getElementById('step-3').classList.add('hidden');
+		document.getElementById('step-2').classList.remove('hidden');
+		document.getElementById('legend2').classList.remove('hidden');
+		document.getElementById('back-btn').classList.remove('hidden');
+		
+		document.getElementById('bookmark-btn').classList.add('hidden');
+		document.getElementById('submit-btn').classList.add('hidden');
+		document.getElementById('legend').classList.add('hidden');
+		
+		showQuestion(0);
+		updateNavGrid();
+	}
+
+    // ... (Bagian Global State, startExamFlow, dll tetap sama) ...
+
+        function showQuestion(index) {
+        currentQIndex = index;
+        const q = questions[index];
+        
+        document.getElementById('current-q-num').innerText = index + 1;
+        
+        // Menampilkan Sub-tes dan Topik di header
+        // document.getElementById('q-subject').innerText = `${q.subject} (${q.topic})`;
+        document.getElementById('q-subject').innerText = `${q.subject}`;
+        
+        document.getElementById('question-text').innerHTML = q.text;
+
+        // --- LOGIKA SCORE & TIMER ---
+        const timerContainer = document.querySelector('.timer');
+        if (isReviewMode) {
+            const answerIndex = answers[index];
+            const scoreObtained = (answerIndex !== null) ? q.options[answerIndex].val : 0;
+            
+            // Memberi warna pada poin di review mode
+            let scoreColor = "#fff";
+            if (scoreObtained === 5) scoreColor = "#2ecc71"; // Hijau jika max
+            else if (scoreObtained === 0) scoreColor = "#e74c3c"; // Merah jika nol
+
+            timerContainer.innerHTML = `Poin: <span style="color:${scoreColor}; font-weight:bold;">+${scoreObtained}</span>`;
+        } else {
+            timerContainer.innerHTML = `Sisa Waktu: <span id="time-display">00:00</span>`;
+        }
+
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+        
+        q.options.forEach((opt, optIndex) => {
+            const label = document.createElement('label');
+            label.className = 'option-label';
+            if (isReviewMode) label.classList.add('review-mode');
+            
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'answer';
+            radio.disabled = isReviewMode;
+
+            const userSelected = answers[index] === optIndex;
+            const isKeyOption = opt.val === 5; 
+
+            if (userSelected) radio.checked = true;
+
+            if (isReviewMode) {
+                label.style.cursor = "default";
+                if (isKeyOption) {
+                    label.classList.add('correct-option'); 
+                } 
+                else if (userSelected && !isKeyOption) {
+                    label.classList.add('wrong-option');
+                } 
+                else {
+                    label.classList.add('default-option');
+                }
+            }
+
+            radio.onchange = () => {
+                if (!isReviewMode) {
+                    answers[index] = optIndex;
+                    updateNavGrid();
+                }
+            };
+
+            label.appendChild(radio);
+            label.appendChild(document.createTextNode(" " + opt.text));
+            optionsContainer.appendChild(label);
+        });
+
+        document.getElementById('prev-btn').disabled = index === 0;
+        document.getElementById('next-btn').disabled = index === questions.length - 1;
+    }
+
+    // Pastikan fungsi timer tetap update elemen yang benar saat ujian berlangsung
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            if (isReviewMode) return; // Jangan jalankan timer saat review
+
+            timeLeft--;
+            let m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            let s = (timeLeft % 60).toString().padStart(2, '0');
+            
+            const timeDisplay = document.getElementById('time-display');
+            if (timeDisplay) {
+                timeDisplay.innerText = `${m}:${s}`;
+            }
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                alert("Waktu habis! Jawaban Anda akan otomatis dikirim.");
+                processResults();
+            }
+        }, 1000);
+    }
+
+    function backToResult() {
+        isReviewMode = false; 
+        document.getElementById('step-2').classList.add('hidden');
+        document.getElementById('step-3').classList.remove('hidden');
+        
+        // Reset Header ke format Timer agar saat Review dibuka lagi tidak tertumpuk
+        const timerContainer = document.querySelector('.timer');
+        timerContainer.innerHTML = `Sisa Waktu: <span id="time-display">00:00</span>`;
+        
+        document.getElementById('bookmark-btn').classList.remove('hidden');
+        document.getElementById('submit-btn').classList.remove('hidden');
+    }
+
+	function updateNavGrid() {
+		const btns = document.querySelectorAll('.nav-grid-btn');
+		btns.forEach((btn, i) => {
+			btn.className = 'nav-grid-btn'; 
+			
+			if (isReviewMode) {
+				const answerIndex = answers[i];
+				const q = questions[i];
+
+				// Untuk TWK & TIU, cek apakah nilainya poin maksimal (asumsi 5)
+				const isCorrect = answerIndex !== null && q.options[answerIndex].val === 5;
+				if (isCorrect) {
+					btn.classList.add('review-correct'); // Jadi Hijau
+				} else {
+					btn.classList.add('review-wrong');   // Jadi Merah (jika salah atau tidak dijawab)
+				}
+			} else {
+				if (bookmarks[i]) btn.classList.add('bookmarked');
+				else if (answers[i] !== null) btn.classList.add('answered');
+			}
+		});
+	}
+
+
+	function prevQuestion() {
+		if (currentQIndex > 0) showQuestion(currentQIndex - 1);
+	}
+
+	function nextQuestion() {
+		if (currentQIndex < questions.length - 1) showQuestion(currentQIndex + 1);
+	}
+
+	function toggleBookmark() {
+		bookmarks[currentQIndex] = !bookmarks[currentQIndex];
+		updateNavGrid();
+		showQuestion(currentQIndex);
+	}
+
+	function renderNavGrid() {
+		const grid = document.getElementById('nav-grid');
+		grid.innerHTML = '';
+		for (let i = 0; i < questions.length; i++) {
+			const btn = document.createElement('button');
+			btn.className = 'nav-grid-btn';
+			btn.innerText = i + 1;
+			btn.onclick = () => showQuestion(i);
+			grid.appendChild(btn);
+		}
+		updateNavGrid();
+	}
+
+
+	// ==========================================
+	// STEP 3: SUBMIT & HALAMAN HASIL
+	// ==========================================
+
+	function confirmSubmit() {
+		const unanswered = answers.filter(a => a === null).length;
+		let message = "Apakah Anda yakin ingin mengakhiri ujian dan melihat hasil?";
+		
+		if (unanswered > 0) {
+			message = `Masih ada ${unanswered} soal yang belum dijawab. Tetap kirim jawaban?`;
+		}
+
+		const isSure = confirm(message);
+		if (isSure) {
+			processResults();
+		}
+	}
+
+	function processResults() {
+		clearInterval(timerInterval);
+		
+		let twkScore = 0;
+		let tiuScore = 0;
+		let tkpScore = 0;
+
+		questions.forEach((q, i) => {
+			const answerIndex = answers[i];
+			const val = answerIndex !== null ? q.options[answerIndex].val : 0;
+			
+			if (q.subject === 'TWK') twkScore += val;
+			else if (q.subject === 'TIU') tiuScore += val;
+			else if (q.subject === 'TKP') tkpScore += val;
+		});
+
+		const totalScore = twkScore + tiuScore + tkpScore;
+		
+		// Sesuaikan ambang batas (Passing Grade) asli SKD jika perlu
+		const isPassed = (twkScore >= 65) && (tiuScore >= 80) && (tkpScore >= 166);
+		const statusText = isPassed ? "<span style='color:green;'>LULUS PASSING GRADE</span>" : "<span style='color:red;'>TIDAK LULUS PG</span>";
+
+		// Update Tampilan ke HTML sesuai ID baru
+		document.getElementById('res-name').innerText = studentName;
+		document.getElementById('res-twk').innerText = twkScore;
+		document.getElementById('res-tiu').innerText = tiuScore;
+		document.getElementById('res-tkp').innerText = tkpScore;
+		document.getElementById('res-total').innerText = totalScore;
+		document.getElementById('res-status').innerHTML = statusText;
+
+		document.getElementById('step-2').classList.add('hidden');
+		document.getElementById('step-3').classList.remove('hidden');
+	}
+
+
+	function restartExam() {
+		const checkRestart = confirm("Apakah Anda ingin mengulang tes? Semua jawaban Anda saat ini akan dihapus.");
+		if (checkRestart) {
+			location.reload();
+		}
+	}
+	</script>
+</body>
+</html>
