@@ -1,0 +1,353 @@
+* {
+    box-sizing: border-box;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    background-color: #f0f2f5; /* Abu-abu sangat muda yang modern */
+    margin: 0;
+    padding: 20px;
+    color: #1c1e21;
+}
+
+.hidden { display: none !important; }
+
+h3{
+    padding: 0
+}
+
+/* --- STEP 1: Landing Page Layout --- */
+.login-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    max-width: 1000px; /* Diperlebar untuk menampung logo + form */
+    margin: 10px auto;
+    padding: 40px;
+    background-color: #fff;
+    border-radius: 15px;
+}
+
+/* Sisi Kiri: Logo & Info */
+.login-logo {
+    flex: 1;
+    text-align: center;
+    padding: 20px;
+}
+
+.login-logo img {
+    max-width: 180px;
+    margin-bottom: 20px;
+}
+
+.login-logo h1 {
+    font-size: 2.2rem;
+    color: #1a73e8;
+    margin-bottom: 10px;
+}
+
+.login-logo p {
+    color: #5f6368;
+    font-size: 1.1rem;
+}
+
+/* Sisi Kanan: Box Form */
+.login-box {
+    flex: 1;
+    max-width: 400px;
+    width: 100%;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+/* Penyesuaian Form Group & Input tetap sama dengan kode Anda sebelumnya */
+.form-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #4b4b4b;
+    font-size: 0.9em;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #dddfe2;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.2s;
+}
+
+
+/* --- STEP 2: Main Exam Container --- */
+.container {
+    display: grid;
+    grid-template-columns: 1fr; /* Desktop: Tetap 4:1 */
+    gap: 24px;
+    max-width: 1000px;
+    margin: 10px auto;
+}
+
+/* Kolom Kiri */
+.main-col {
+    background: #ffffff;
+    padding: 30px 45px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    min-height: 480px;
+}
+
+.quiz-header {
+    display: flex;
+    justify-content: space-between; /* Tetap justify */
+    align-items: center;
+    border-bottom: 1px solid #333;
+    padding-bottom: 15px;
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+
+.timer {
+    color: #f0f2f5;
+    background: #1a73e8;
+    padding: 6px 16px;
+    border-radius: 20px; /* Lebih rounded agar clean */
+    font-variant-numeric: tabular-nums;
+}
+
+.options-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+.option-label {
+    padding: 16px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+}
+
+.option-label:hover {
+    background: #f8fbff;
+    border-color: #007bff;
+}
+
+.nav-buttons {
+    display: flex;
+    justify-content: space-between; /* Tetap justify */
+    gap: 12px;
+    margin-top: auto;
+}
+
+/* Kolom Kanan (Sidebar) */
+.sidebar-col {
+    background: #ffffff;
+    padding: 20px 45px 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    height: fit-content;
+}
+
+.nav-grid {
+    display: grid;
+    grid-template-columns: repeat(20, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.nav-grid-btn {
+    padding: 8px 0;
+    text-align: center;
+    border-radius: 6px;
+    color: white;
+    font-weight: 600;
+    background-color: #cbd5e0; /* Abu-abu lebih soft */
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.nav-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+}
+.nav-grid-btn.answered { background-color: #34a853; }
+.nav-grid-btn.bookmarked { background-color: #fbbc05; color: #3c4043; }
+
+.legend { display: flex; font-size: 0.85em; color: #5f6368; gap: 10px; justify-content: flex-end; }
+.legend div { display: flex; align-items: center; margin-bottom: 10px; }
+.box { width: 14px; height: 14px; display: inline-block; margin-right: 10px; border-radius: 4px; }
+
+/* Global Buttons */
+button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    color: white;
+    transition: filter 0.2s;
+}
+
+button:hover { filter: brightness(0.9); }
+button:active { transform: translateY(1px); }
+
+#start-btn { background-color: #34a853; width: 100%; font-size: 1rem; }
+#prev-btn { background-color: #1a73e8; flex: 1; }
+#next-btn { background-color: #1a73e8; flex: 1; }
+#bookmark-btn { background-color: #ffc001; flex: 1; }
+#submit-btn { background-color: #1a73e8; width: 100%; padding: 10px; margin-top: 15px;}
+#back-btn { background-color: #1a73e8; width: 100%; padding: 10px; margin-top: 15px;}
+button:disabled { background-color: #e0e0e0 !important; color: #a0a0a0; cursor: not-allowed; }
+
+/* --- STEP 3: Result Page --- */
+.result-box {
+    max-width: 800px;
+    width: 100%;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    margin: 10px auto;
+}
+
+.result-box h2{
+    margin: 0;
+    text-align: center;
+    border-bottom: 2px solid #333;
+    padding-bottom: 15px;
+}
+
+.congrats-box {
+    text-align: center;
+    padding: 5px;
+    background: #f9f9f9;
+    border-radius: 5px;
+    margin: 10px 0 0;
+}
+#res-name {
+    font-weight: bold;
+    color:#1a73e8;
+}
+
+.result-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+}
+
+.result-table th, .result-table td {
+    border-bottom: 1px solid #eff2f5;
+    padding: 14px;
+    text-align: center;
+}
+
+.result-table th { color: #5f6368; font-weight: 600; background: #f8f9fa; }
+.total-row { background-color: #f1f7ff; font-weight: 700; color: #1a73e8; }
+.status-box {
+    text-align: center;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 5px;
+}
+#restart-btn { background-color: #5f6368; width: 100%; }
+
+.option-label.correct-option {
+    background: #e6ffed !important;
+    border-color: #28a745 !important;
+    color: #155724;
+}
+
+.option-label.wrong-option {
+    background: #ffeef0 !important;
+    border-color: #dc3545 !important;
+    color: #721c24;
+}
+
+.option-label.default-option {
+    background-color: #ffffff !important;
+    border-color: #dddfe2 !important;
+    color: #8d949e !important;
+}
+
+/* Untuk tombol navigasi saat review */
+.nav-grid-btn.review-correct {
+    background-color: #28a745 !important;
+    color: white;
+}
+.nav-grid-btn.review-wrong {
+    background-color: #dc3545 !important;
+    color: white;
+}
+
+/* Tambahkan kursor bantuan */
+.option-label.review-mode { cursor: default; pointer-events: none; }
+
+/* ==========================================
+   MEDIA QUERIES
+   ========================================== */
+@media (max-width: 768px) {
+    body { padding: 12px; }
+    .container { grid-template-columns: 1fr; gap: 16px; }
+    .main-col { padding: 20px; min-height: auto; }
+    .sidebar-col { padding: 20px; } /* Navigasi otomatis di bawah soal */
+    .nav-buttons { gap: 8px; }
+    button { padding: 12px 8px; font-size: 13px; }
+    .login-wrapper {
+        flex-direction: column; /* Logo jadi di atas, Form di bawah */
+        margin: 40px auto;
+        gap: 20px;
+        padding: 20px;
+    }
+    
+    .login-logo {
+        padding: 0;
+    }
+    
+    .login-logo img {
+        max-width: 120px;
+    }
+}
+
+
+/* Hijau untuk kunci jawaban */
+.correct-option {
+    background-color: #d4edda !important;
+    border: 2px solid #28a745 !important;
+    color: #155724 !important;
+    font-weight: bold;
+}
+
+/* Merah untuk pilihan user yang salah */
+.wrong-option {
+    background-color: #f8d7da !important;
+    border: 2px solid #dc3545 !important;
+    color: #721c24 !important;
+}
+
+/* Abu-abu untuk opsi netral */
+.default-option {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    color: #adb5bd;
+    opacity: 0.7;
+}
