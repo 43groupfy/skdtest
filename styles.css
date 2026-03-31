@@ -681,7 +681,8 @@ button:disabled { background-color: #e0e0e0 !important; color: #a0a0a0; cursor: 
     }
     
     .login-logo img {
-        max-width: 120px;
+        max-width: 180px;
+        max-height: 180px;
     }
 }
 
