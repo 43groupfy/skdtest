@@ -477,6 +477,25 @@
 		document.getElementById('res-total').innerText = totalScore;
 		document.getElementById('res-status').innerHTML = statusText;
 
+		// Kode Appsheet
+		// Kirim hasil ke Google Sheet
+		const sheetUrl = "https://script.google.com/macros/s/AKfycbwxEwtq3tah-gkP_ACf6AGsQ2r94b4fQ6cjjeIuwtc_FMfhABQdCoLnIH7DIbQQ0jrN/exec";
+		const statusBersih = isPassed ? "LULUS PASSING GRADE" : "TIDAK LULUS PG";
+		
+		fetch(sheetUrl, {
+		  method: "POST",
+		  mode: "no-cors",
+		  headers: { "Content-Type": "application/json" },
+		  body: JSON.stringify({
+		    nama: studentName,
+		    twk: twkScore,
+		    tiu: tiuScore,
+		    tkp: tkpScore,
+		    total: totalScore,
+		    status: statusBersih
+		  })
+		});
+
 		document.getElementById('step-2').classList.add('hidden');
 		document.getElementById('step-3').classList.remove('hidden');
 	}
