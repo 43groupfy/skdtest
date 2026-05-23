@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="img.png">
+    <title>Drill Soal SKD - Responsive & Split Level</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #e0e7ff;
+            
+            --success-bg: #f0fdf4;
+            --success-border: #86efac;
+            --success-text: #166534;
+            
+            --danger-bg: #fef2f2;
+            --danger-border: #fca5a5;
+            --danger-text: #991b1b;
+            
+            --border-color: #e2e8f0;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            margin: 0;
+            padding: 40px 20px;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .hidden { display: none !important; }
+
+        /* ==========================================
+           LOGIN PAGE
+           ========================================== */
+        .login-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 60px;
+            max-width: 950px;
+            margin: 4vh auto;
+            padding: 60px;
+            background-color: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .login-logo { flex: 1.2; text-align: center; }
+        .login-logo img { max-width: 220px; margin-bottom: 25px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1)); }
+        .login-logo h1 { font-size: 2.8rem; font-weight: 800; color: var(--primary); margin: 0 0 10px 0; letter-spacing: -1px;}
+        .login-logo p { color: var(--text-muted); font-size: 1.15rem; }
+
+        .login-box { flex: 1; width: 100%; }
+        .form-group { margin-bottom: 24px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.95rem; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 14px 16px; background-color: var(--bg-body);
+            border: 1px solid var(--border-color); border-radius: var(--radius-md);
+            font-size: 16px; color: var(--text-main); transition: all 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79,70,229,0.15);
+        }
+        
+        .checkbox-group { display: flex; align-items: center; gap: 10px; margin-top: -10px; margin-bottom: 20px; }
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
+        .checkbox-group label { font-size: 14px; color: var(--text-muted); cursor: pointer; }
+
+        .opt-full { font-weight: 700; color: var(--primary); }
+        .error-text { color: var(--danger-text); background-color: var(--danger-bg); padding: 12px; border-radius: 6px; font-size: 0.9em; margin-bottom: 20px; text-align: center; border: 1px solid var(--danger-border); }
+
+        /* ==========================================
+           MAIN EXAM (LAYOUT DEFAULT UNTUK LAPTOP)
+           ========================================== */
+        .drill-container { 
+            display: grid; 
+            grid-template-columns: 1fr 340px; 
+            gap: 30px; 
+            max-width: 1100px; 
+            margin: 0 auto; 
+            align-items: start;
+        }
+        
+        .main-col {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 40px;
+        }
+
+        .sidebar-col {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: sticky; 
+            top: 40px;
+        }
+
+        /* ==========================================
+           GAMIFICATION PANEL
+           ========================================== */
+        .gamification-panel {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            color: #f8fafc;
+            border-radius: var(--radius-lg);
+            padding: 30px 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .level-badge { font-size: 1.3rem; font-weight: 800; text-align: center; margin-bottom: 5px;}
+        .level-badge span.highlight { color: #fbbf24; }
+
+        .streak-badge {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-align: center;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        .streak-active {
+            color: #fbbf24;
+            background: rgba(251, 191, 36, 0.15);
+            border-color: rgba(251, 191, 36, 0.4);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
+            transform: scale(1.05);
+        }
+
+        .xp-wrapper { display: flex; flex-direction: column; gap: 8px; }
+        .xp-container {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            height: 12px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .xp-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+            width: 0%;
+            transition: width 0.6s ease-out;
+            border-radius: 20px;
+        }
+        .xp-text { font-size: 0.9rem; text-align: center; color: #cbd5e1; font-weight: 500; }
+
+        @keyframes levelUpAnim {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); text-shadow: 0 0 20px rgba(251,191,36,0.8); }
+            100% { transform: scale(1); }
+        }
+        .level-up-trigger { animation: levelUpAnim 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* ==========================================
+           QUIZ AREA
+           ========================================== */
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+            font-size: 1.05rem;
+            color: var(--text-muted);
+        }
+
+        .q-number strong { color: var(--text-main); font-size: 1.2rem;}
+        #question-text { font-size: 1.15rem; color: var(--text-main); margin-bottom: 30px; font-weight: 500; }
+
+        .options-group { display: flex; flex-direction: column; gap: 14px; margin-bottom: 30px;}
+
+        .option-label {
+            padding: 18px 20px; background: var(--bg-card); border: 2px solid var(--border-color);
+            border-radius: var(--radius-md); cursor: pointer; display: flex; align-items: center; gap: 15px;
+            font-size: 1.05rem; font-weight: 500; transition: all 0.2s ease;
+        }
+        .option-label:hover { border-color: var(--primary-light); background: #f8fafc; }
+        .option-label input[type="radio"] { width: 20px; height: 20px; accent-color: var(--primary); cursor: pointer; margin: 0; }
+        .option-label.disabled { pointer-events: none; cursor: not-allowed; opacity: 0.7; }
+
+        .correct-choice { background-color: var(--success-bg) !important; border-color: var(--success-border) !important; color: var(--success-text) !important; }
+        .wrong-choice { background-color: var(--danger-bg) !important; border-color: var(--danger-border) !important; color: var(--danger-text) !important; }
+        #q-score-feedback { font-weight: 800; margin-left: 8px; font-size: 1.1em; }
+
+        /* ==========================================
+           BUTTONS
+           ========================================== */
+        button {
+            padding: 16px 24px; border: none; border-radius: var(--radius-md); cursor: pointer;
+            font-weight: 700; font-size: 1.05rem; transition: all 0.2s ease; width: 100%;
+        }
+        button:active { transform: scale(0.98); }
+        button:disabled { background-color: var(--border-color) !important; color: var(--text-muted) !important; cursor: not-allowed; }
+
+        #start-btn { background-color: var(--primary); color: white; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3); }
+        #start-btn:hover { background-color: var(--primary-hover); }
+
+        .btn-action { background-color: var(--primary); color: white; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2); margin-top: 10px;}
+        .btn-action:hover:not(:disabled) { background-color: var(--primary-hover); }
+
+        .btn-end { background-color: #ffffff; color: var(--danger-text); border: 2px solid var(--danger-border); }
+        .btn-end:hover { background-color: var(--danger-bg); }
+
+        /* ==========================================
+           RESPONSIVE MOBILE (LAYOUT LAMA)
+           ========================================== */
+        @media (max-width: 900px) {
+            body { padding: 20px 15px; }
+            
+            .login-wrapper { flex-direction: column; padding: 40px 25px; gap: 30px; margin: 2vh auto; }
+            .login-logo img { max-width: 150px; }
+            .login-logo h1 { font-size: 2.2rem; }
+            
+            /* Ubah Grid jadi Flex Column untuk Mobile */
+            .drill-container { 
+                display: flex; 
+                flex-direction: column; 
+                gap: 20px; 
+            }
+            
+            /* Sidebar (Gamifikasi) Pindah ke Atas */
+            .sidebar-col { 
+                order: 2; 
+                position: static; 
+                gap: 15px; 
+                width: 100%
+            }
+            
+            /* Main Content (Soal) Pindah ke Bawah Gamifikasi */
+            .main-col { 
+                order: 1; 
+                padding: 25px 20px; 
+            }
+            
+            /* Penyesuaian Panel Gamifikasi di HP (Mendatar/Rapat) */
+            .gamification-panel { 
+                padding: 20px; 
+                gap: 15px; 
+            }
+            
+            .level-badge { font-size: 1.1rem; }
+            .streak-badge { font-size: 1rem; padding: 8px; }
+            .option-label { padding: 15px; font-size: 1rem; }
+            .quiz-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- STEP 1: LOGIN -->
+    <div id="step-1" class="step-container login-wrapper">
+        <div class="login-logo">
+            <img src="img.png" alt="Logo">
+            <h1>Drill SKD</h1>
+            <p>Berlatih efisien, tingkatkan insting menjawabmu.</p>
+        </div>
+        <div class="login-box">
+            <div class="form-group">
+                <label for="exam-pin">Password Akses</label>
+                <input type="password" id="exam-pin" placeholder="Masukkan password" required>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="remember-me">
+                <label for="remember-me">Ingat saya di perangkat ini</label>
+            </div>
+            <div class="form-group">
+                <label for="topic-select">Pilih Mode Latihan</label>
+                <select id="topic-select">
+                    <optgroup label="=== TES WAWASAN KEBANGSAAN ===">
+                        <option value="FULL_TWK" class="opt-full">🎯 SIMULASI FULL TWK</option>
+                        <option value="Nasionalisme">Nasionalisme</option>
+                        <option value="Integritas">Integritas</option>
+                        <option value="BelaNegara">Bela Negara</option>
+                        <option value="Pancasila">Pancasila</option>
+                        <option value="Bhineka">Bhineka Tunggal Ika</option>
+                        <option value="NKRI">NKRI</option>
+                        <option value="UUD1945">UUD 1945</option>
+                        <option value="BahasaIndo">Bahasa Indonesia</option>
+                    </optgroup>
+                    <optgroup label="=== TES INTELEGENSIA UMUM ===">
+                        <option value="FULL_TIU" class="opt-full">🎯 SIMULASI FULL TIU</option>
+                        <option value="Analogis">Analogis</option>
+                        <option value="Silogisme">Silogisme</option>
+                        <option value="Analitis">Analitis</option>
+                        <option value="Deret">Deret</option>
+                        <option value="Numerik">Numerik</option>
+                    </optgroup>
+                    <optgroup label="=== TES KARAKTERISTIK PRIBADI ===">
+                        <option value="FULL_TKP" class="opt-full">🎯 SIMULASI FULL TKP</option>
+                        <option value="PelayananPublik">Pelayanan Publik</option>
+                        <option value="JejaringKerja">Jejaring Kerja</option>
+                        <option value="SosialBudaya">Sosial Budaya</option>
+                        <option value="TIK">TIK</option>
+                        <option value="Profesionalisme">Profesionalisme</option>
+                        <option value="Antiradikalisme">Antiradikalisme</option>
+                    </optgroup>
+                </select>
+            </div>
+            <p id="login-error" class="error-text hidden">Password salah!</p>
+            <button id="start-btn" onclick="startSession()">Mulai Sesi Latihan</button>
+        </div>
+    </div>
+
+    <!-- STEP 2: MODE LATIHAN -->
+    <div id="step-2" class="container drill-container hidden">
+        <!-- Kolom Kiri: Soal Utama -->
+        <main class="main-col">
+            <header class="quiz-header">
+                <div class="q-number">Soal ke- <strong><span id="q-counter">1</span></strong> <span id="q-score-feedback"></span></div>
+                <div class="q-topic-label">Topik: <strong id="q-topic"></strong></div>
+            </header>
+            
+            <div class="question-area">
+                <p id="question-text">Memuat pertanyaan...</p>
+                <div id="options-container" class="options-group"></div>
+            </div>
+
+            <div class="action-area">
+                <button id="save-btn" class="btn-action" onclick="saveAnswer()" disabled>Simpan Jawaban</button>
+                <button id="next-btn" class="btn-action" onclick="nextQuestion()" style="display: none;">Selanjutnya ❯</button>
+            </div>
+        </main>
+
+        <!-- Kolom Kanan: Gamifikasi (di HP otomatis naik ke atas) -->
+        <aside class="sidebar-col">
+            <div class="gamification-panel">
+                <div class="level-badge" id="level-badge-container">
+                    ⭐ Level <span id="ui-cat-name">TWK</span>: <span class="highlight" id="ui-level">0</span>
+                </div>
+                <div class="streak-badge" id="ui-streak-badge">
+                    🔥 <span id="ui-streak">0</span> Streak
+                </div>
+                <div class="xp-wrapper">
+                    <div class="xp-text"><span id="ui-current-xp">0</span> / <span id="ui-next-xp">50</span> EXP</div>
+                    <div class="xp-container">
+                        <div class="xp-bar" id="ui-xp-bar"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="end-btn" class="btn-end" onclick="endSession()">Akhiri Sesi</button>
+        </aside>
+    </div>
+
+    <!-- Database Script -->
+    <script src="twk2_db.js"></script>
+    <script src="tiu2_db.js"></script>
+    <script src="tkp2_db.js"></script>
+
+    <script>
+    // ==========================================
+    // LOGIKA GAMIFIKASI TERPISAH (TWK, TIU, TKP)
+    // ==========================================
+    const twkList = ["FULL_TWK", "Nasionalisme", "Integritas", "BelaNegara", "Pancasila", "Bhineka", "NKRI", "UUD1945", "BahasaIndo"];
+    const tiuList = ["FULL_TIU", "Analogis", "Silogisme", "Analitis", "Deret", "Numerik"];
+    const tkpList = ["FULL_TKP", "PelayananPublik", "JejaringKerja", "SosialBudaya", "TIK", "Profesionalisme", "Antiradikalisme"];
+
+    let activeCategory = ""; // Menyimpan jenis kategori saat ini: "TWK", "TIU", atau "TKP"
+    let userStats = { level: 0, xp: 0, streak: 0 }; // Objek stat aktif
+
+    function determineCategory(topic) {
+        if (twkList.includes(topic)) return "TWK";
+        if (tiuList.includes(topic)) return "TIU";
+        if (tkpList.includes(topic)) return "TKP";
+        return "TWK"; // Default fallback
+    }
+
+    function loadStats(category) {
+        const saved = localStorage.getItem('skd_stats_' + category);
+        if (saved) {
+            return JSON.parse(saved);
+        }
+        return { level: 0, xp: 0, streak: 0 };
+    }
+
+    function saveStats() {
+        localStorage.setItem('skd_stats_' + activeCategory, JSON.stringify(userStats));
+    }
+
+    function getXpNeededForNextLevel(level) { 
+        return (level + 1) * 50; 
+    }
+
+    function updateGamificationUI() {
+        const xpNeeded = getXpNeededForNextLevel(userStats.level);
+        const xpPercentage = Math.min((userStats.xp / xpNeeded) * 100, 100);
+
+        document.getElementById('ui-cat-name').innerText = activeCategory;
+        document.getElementById('ui-level').innerText = userStats.level;
+        document.getElementById('ui-streak').innerText = userStats.streak;
+        document.getElementById('ui-current-xp').innerText = userStats.xp;
+        document.getElementById('ui-next-xp').innerText = xpNeeded;
+        document.getElementById('ui-xp-bar').style.width = xpPercentage + '%';
+
+        const streakBadge = document.getElementById('ui-streak-badge');
+        if (userStats.streak >= 2) {
+            streakBadge.classList.add('streak-active');
+        } else {
+            streakBadge.classList.remove('streak-active');
+        }
+    }
+
+    function processGamification(pointsObtained) {
+        let earnedXp = 0;
+        let isTKP = (activeCategory === "TKP");
+
+        if (pointsObtained === 5) {
+            userStats.streak++;
+            if (isTKP) {
+                earnedXp = 5; // TKP tanpa bonus perkalian
+            } else {
+                earnedXp = 5 + ((userStats.streak - 1) * 2); // TWK/TIU dengan bonus
+            }
+        } else {
+            userStats.streak = 0; // Streak putus
+            if (isTKP) {
+                earnedXp = pointsObtained; // TKP dapat 1, 2, 3, 4
+            } else {
+                earnedXp = -1; // TWK/TIU salah kena minus 1
+            }
+        }
+
+        userStats.xp += earnedXp;
+        if (userStats.xp < 0) userStats.xp = 0; // Jaga agar tidak minus di bawah 0
+
+        let xpNeeded = getXpNeededForNextLevel(userStats.level);
+        let leveledUp = false;
+
+        while (userStats.xp >= xpNeeded) {
+            userStats.xp -= xpNeeded;
+            userStats.level++;
+            leveledUp = true;
+            xpNeeded = getXpNeededForNextLevel(userStats.level);
+        }
+
+        saveStats(); // Simpan stat ke localStorage yang spesifik
+        updateGamificationUI();
+
+        if (leveledUp) {
+            const levelContainer = document.getElementById('level-badge-container');
+            levelContainer.classList.remove('level-up-trigger');
+            void levelContainer.offsetWidth; 
+            levelContainer.classList.add('level-up-trigger');
+        }
+
+        return earnedXp;
+    }
+
+    // ==========================================
+    // LOGIKA UJIAN / QUIZ ENGINE
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedPin = localStorage.getItem('skd_drill_password');
+        if (savedPin) {
+            document.getElementById('exam-pin').value = savedPin;
+            document.getElementById('remember-me').checked = true;
+        }
+    });
+
+    let sessionQuestions = [];
+    let currentQIndex = 0;
+    let questionsAnsweredCount = 0;
+    let isSaved = false;
+    let activeTopicValue = ""; 
+    let currentSelectedOption = null;
+    let currentSelectedLabel = null;
+    let currentQuestionData = null;
+
+    function shuffle(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    function collectSoal(sections) {
+        let result = [];
+        sections.forEach(sec => {
+            if(sec.data && sec.data.length > 0) {
+                const sampled = shuffle([...sec.data]).slice(0, sec.count);
+                result.push(...sampled);
+            }
+        });
+        return result;
+    }
+
+    function generateSessionData(topicValue) {
+        if (topicValue === "FULL_TWK") {
+            const twkSections = [
+                { data: twk_Nasionalisme, count: 5 }, { data: twk_Integritas, count: 5 },
+                { data: twk_BelaNegara, count: 5 }, { data: twk_Pancasila, count: 3 },
+                { data: twk_Bhineka, count: 3 }, { data: twk_NKRI, count: 3 },
+                { data: twk_UUD1945, count: 3 }, { data: twk_BahasaIndo, count: 3 }
+            ];
+            return shuffle(collectSoal(twkSections));
+        } else if (topicValue === "FULL_TIU") {
+            const tiuSections = [
+                { data: tiu_Analogis, count: 5 }, { data: tiu_Silogisme, count: 5 },
+                { data: tiu_Analitis, count: 7 }, { data: tiu_Deret, count: 5 },
+                { data: tiu_Numerik, count: 13 }
+            ];
+            return shuffle(collectSoal(tiuSections));
+        } else if (topicValue === "FULL_TKP") {
+            const tkpSections = [
+                { data: tkp_PelayananPublik, count: 8 }, { data: tkp_JejaringKerja, count: 8 },
+                { data: tkp_SosialBudaya, count: 8 }, { data: tkp_TIK, count: 7 },
+                { data: tkp_Profesionalisme, count: 7 }, { data: tkp_Antiradikalisme, count: 7 }
+            ];
+            return shuffle(collectSoal(tkpSections));
+        } else {
+            let rawData = [];
+            switch(topicValue) {
+                case "Nasionalisme": rawData = twk_Nasionalisme; break;
+                case "Integritas": rawData = twk_Integritas; break;
+                case "BelaNegara": rawData = twk_BelaNegara; break;
+                case "Pancasila": rawData = twk_Pancasila; break;
+                case "Bhineka": rawData = twk_Bhineka; break;
+                case "NKRI": rawData = twk_NKRI; break;
+                case "UUD1945": rawData = twk_UUD1945; break;
+                case "BahasaIndo": rawData = twk_BahasaIndo; break;
+                case "Analogis": rawData = tiu_Analogis; break;
+                case "Silogisme": rawData = tiu_Silogisme; break;
+                case "Analitis": rawData = tiu_Analitis; break;
+                case "Deret": rawData = tiu_Deret; break;
+                case "Numerik": rawData = tiu_Numerik; break;
+                case "PelayananPublik": rawData = tkp_PelayananPublik; break;
+                case "JejaringKerja": rawData = tkp_JejaringKerja; break;
+                case "SosialBudaya": rawData = tkp_SosialBudaya; break;
+                case "TIK": rawData = tkp_TIK; break;
+                case "Profesionalisme": rawData = tkp_Profesionalisme; break;
+                case "Antiradikalisme": rawData = tkp_Antiradikalisme; break;
+            }
+            return shuffle([...rawData]);
+        }
+    }
+
+    function startSession() {
+        const pinInput = document.getElementById('exam-pin').value;
+        const rememberMe = document.getElementById('remember-me').checked;
+        const errorMsg = document.getElementById('login-error');
+
+        if (pinInput !== "tatangsayang") {
+            errorMsg.classList.remove('hidden');
+            return;
+        }
+        errorMsg.classList.add('hidden');
+
+        if (rememberMe) {
+            localStorage.setItem('skd_drill_password', pinInput);
+        } else {
+            localStorage.removeItem('skd_drill_password');
+        }
+
+        const topicSelect = document.getElementById('topic-select');
+        activeTopicValue = topicSelect.value;
+        const selectedTopicText = topicSelect.options[topicSelect.selectedIndex].text;
+        
+        // Memastikan sistem tahu ini kategori apa dan muat data stat-nya
+        activeCategory = determineCategory(activeTopicValue);
+        userStats = loadStats(activeCategory);
+
+        sessionQuestions = generateSessionData(activeTopicValue);
+        
+        if (!sessionQuestions || sessionQuestions.length === 0) {
+            alert("Database soal belum tersedia!");
+            return;
+        }
+
+        currentQIndex = 0;
+        questionsAnsweredCount = 1;
+        
+        document.getElementById('step-1').classList.add('hidden');
+        document.getElementById('step-2').classList.remove('hidden');
+        document.getElementById('q-topic').innerText = selectedTopicText;
+
+        updateGamificationUI();
+        showQuestion();
+    }
+
+    function showQuestion() {
+        currentQuestionData = sessionQuestions[currentQIndex];
+        isSaved = false;
+        currentSelectedOption = null;
+        currentSelectedLabel = null;
+        
+        document.getElementById('q-counter').innerText = questionsAnsweredCount;
+        document.getElementById('q-score-feedback').innerText = ""; 
+        document.getElementById('question-text').innerHTML = currentQuestionData.text;
+        
+        document.getElementById('save-btn').style.display = 'block';
+        document.getElementById('save-btn').disabled = true; 
+        document.getElementById('next-btn').style.display = 'none';
+
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+        
+        currentQuestionData.options.forEach((opt) => {
+            const label = document.createElement('label');
+            label.className = 'option-label';
+            
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'answer';
+
+            label.appendChild(radio);
+            label.appendChild(document.createTextNode(" " + opt.text));
+
+            label.onclick = (e) => {
+                if (isSaved) { e.preventDefault(); return; }
+                radio.checked = true;
+                currentSelectedOption = opt;
+                currentSelectedLabel = label;
+                document.getElementById('save-btn').disabled = false;
+            };
+
+            optionsContainer.appendChild(label);
+        });
+    }
+
+    function saveAnswer() {
+        if (!currentSelectedOption || isSaved) return;
+        isSaved = true;
+
+        const allLabels = document.getElementById('options-container').querySelectorAll('.option-label');
+        allLabels.forEach(l => l.classList.add('disabled'));
+
+        const scoreFeedbackSpan = document.getElementById('q-score-feedback');
+        
+        // Warnai jawaban < 5 dengan merah
+        if (currentSelectedOption.val === 5) {
+            currentSelectedLabel.classList.add('correct-choice'); 
+            scoreFeedbackSpan.style.color = 'var(--success-text)'; 
+        } else {
+            currentSelectedLabel.classList.add('wrong-choice'); 
+            scoreFeedbackSpan.style.color = 'var(--danger-text)'; 
+        }
+
+        // Terapkan penambahan/pengurangan EXP berdasarkan kategori
+        const earnedExp = processGamification(currentSelectedOption.val);
+
+        if (earnedExp > 0) {
+            scoreFeedbackSpan.innerText = `(+${earnedExp} Exp)`;
+        } else if (earnedExp < 0) {
+            scoreFeedbackSpan.innerText = `(${earnedExp} Exp)`;
+        } else {
+            scoreFeedbackSpan.innerText = `(+0 Exp)`;
+        }
+
+        document.getElementById('save-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    
+    // ==========================================
+    // TAMBAHKAN KODE INI DI SINI
+    // ==========================================
+    // Membuat layar otomatis scroll mulus ke bagian atas soal
+    document.querySelector('.drill-container').scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+    });
+}
+
+    function nextQuestion() {
+        currentQIndex++;
+        questionsAnsweredCount++;
+
+        if (currentQIndex >= sessionQuestions.length) {
+            sessionQuestions = generateSessionData(activeTopicValue);
+            currentQIndex = 0;
+        }
+        showQuestion();
+    }
+
+    function endSession() {
+        const konfirmasi = confirm("Yakin ingin mengakhiri sesi latihan ini? EXP dan Level kamu tetap tersimpan!");
+        if (konfirmasi) {
+            document.getElementById('step-2').classList.add('hidden');
+            document.getElementById('step-1').classList.remove('hidden');
+        }
+    }
+    </script>
+</body>
+</html>
