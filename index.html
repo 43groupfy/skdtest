@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="img.png">
+    <title>Portal Persiapan SKD CPNS</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #e0e7ff;
+            
+            --border-color: #e2e8f0;
+            --radius-lg: 14px;
+            --radius-md: 8px;
+            
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Dibuat pas layar (fit-to-screen) untuk laptop */
+        body {
+            background-color: var(--bg-body);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh; /* Memaksa body setinggi layar persis */
+            overflow: hidden; /* Mencegah munculnya scrollbar di laptop */
+        }
+
+        .portal-wrapper {
+            max-width: 850px; /* Dipersempit agar proporsional karena kartunya mengecil */
+            width: 100%;
+        }
+
+        /* Header dipadatkan */
+        .portal-header {
+            text-align: center;
+            margin-bottom: 25px; /* Jarak bawah dipangkas */
+        }
+
+        .portal-header img {
+            max-width: 90px; /* Logo diperkecil */
+            margin-bottom: 10px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
+
+        .portal-header h1 {
+            font-size: 2rem; /* Judul diperkecil */
+            font-weight: 800;
+            color: var(--text-main);
+            margin: 0 0 5px 0;
+            letter-spacing: -1px;
+        }
+
+        .portal-header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            max-width: 550px;
+            margin: 0 auto;
+        }
+
+        /* Layout Kartu */
+        .cards-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px; /* Jarak antar kartu dikurangi */
+        }
+
+        .mode-card {
+            background-color: var(--bg-card);
+            padding: 25px 25px; /* Padding kartu dikurangi */
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-light);
+        }
+
+        .card-icon {
+            font-size: 2.5rem; /* Ikon diperkecil */
+            margin-bottom: 10px;
+        }
+
+        .card-title {
+            font-size: 1.25rem; /* Judul kartu diperkecil */
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .card-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem; /* Deskripsi diperkecil */
+            line-height: 1.4;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+            text-align: left;
+            display: inline-block;
+        }
+
+        .feature-list li {
+            margin-bottom: 6px; /* Jarak antar list dirapatkan */
+            font-size: 0.85rem; /* Teks list diperkecil */
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-action {
+            display: block;
+            width: 100%;
+            padding: 12px 20px; /* Tombol dibuat lebih ramping */
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
+            cursor: pointer;
+        }
+
+        .mode-card:hover .btn-action { background-color: var(--primary-hover); }
+
+        .card-test { border-top: 5px solid #0ea5e9; }
+        .card-test .card-title { color: #0ea5e9; }
+        .card-test .btn-action { background-color: #0ea5e9; box-shadow: 0 4px 10px rgba(14, 165, 233, 0.2);}
+        .card-test:hover .btn-action { background-color: #0284c7; }
+        .card-test:hover { border-color: #e0f2fe; }
+
+        .card-game { border-top: 5px solid var(--primary); }
+
+        /* Khusus HP agar tetap bisa di-scroll kalau numpuk bawah */
+        @media (max-width: 768px) {
+            body {
+                height: auto; 
+                overflow: auto; 
+                padding: 30px 15px; 
+            }
+            .portal-header h1 { font-size: 1.8rem; }
+            .cards-container { grid-template-columns: 1fr; gap: 15px; }
+            .mode-card { padding: 25px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="portal-wrapper">
+        <header class="portal-header">
+            <img src="img.png" alt="Logo">
+            <h1>Sistem Persiapan SKD</h1>
+            <p>Pilih mode pembelajaran yang sesuai dengan target fokus Anda hari ini.</p>
+        </header>
+
+        <div class="cards-container">
+            <a href="test.html" class="mode-card card-test">
+                <div class="card-icon">⏱️</div>
+                <div class="card-title">Simulasi Ujian</div>
+                <div class="card-desc">
+                    Rasakan tekanan ujian yang sebenarnya. Kerjakan 110 soal penuh secara acak dengan batas waktu standar.
+                </div>
+                <ul class="feature-list">
+                    <li>✔️ Waktu mundur 100 menit</li>
+                    <li>✔️ Kalkulasi Passing Grade SKD</li>
+                    <li>✔️ Review soal di akhir ujian</li>
+                    <li>✔️ Simpan otomatis ke rapor</li>
+                </ul>
+                <button class="btn-action">Buka Mode Ujian</button>
+            </a>
+
+            <a href="game.html" class="mode-card card-game">
+                <div class="card-icon">🎮</div>
+                <div class="card-title">Gamification</div>
+                <div class="card-desc">
+                    Belajar lebih santai tanpa batasan waktu. Jawab soal dengan benar berturut-turut untuk meningkatkan levelmu.
+                </div>
+                <ul class="feature-list">
+                    <li>✔️ Latihan per sub-topik materi</li>
+                    <li>✔️ Ketahui jawaban benar langsung</li>
+                    <li>✔️ Kumpulkan EXP & Level Up!</li>
+                    <li>✔️ Bangun Combo Streak (🔥)</li>
+                </ul>
+                <button class="btn-action">Buka Mode Game</button>
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>
