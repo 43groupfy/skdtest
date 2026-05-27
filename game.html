@@ -634,11 +634,17 @@
             }
         
             /* Pastikan semua konten dalam main-col tidak overflow */
-            .question-area,
-            #options-container,
-            .quiz-header {
+            .question-area{
+                width: 95%;
+                box-sizing: border-box;
+            }
+            .quiz-header{
+                width: 95%;
+                box-sizing: border-box;
+            }
+            
+            #options-container {
                 width: 100%;
-                max-width: 100%;
                 box-sizing: border-box;
             }
         
