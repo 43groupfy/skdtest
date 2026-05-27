@@ -591,18 +591,22 @@
         @media (max-width: 768px) {
             body {
                 padding: 0;
+                overflow-x: hidden; /* Cegah scroll horizontal */
             }
-
+        
             .drill-container {
                 display: flex;
                 flex-direction: column;
                 gap: 0;
+                max-width: 100%;
+                overflow-x: hidden;
             }
-
+        
             .login-wrapper {
                 margin: 10px;
+                box-sizing: border-box;
             }
-
+        
             /* Top bar fixed */
             .sidebar-col {
                 position: static;
@@ -617,13 +621,39 @@
                 justify-content: space-between;
                 gap: 12px;
                 margin: 0;
+                box-sizing: border-box;
             }
-
-            /* Area soal */
+        
+            /* Area soal - perbaikan utama */
             .main-col {
-                padding: 0 7px 70px 15px;
+                padding: 0 16px 70px 16px; /* simetris kiri-kanan, hindari overflow */
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+                overflow-x: hidden;
             }
-
+        
+            /* Pastikan semua konten dalam main-col tidak overflow */
+            .question-area,
+            #options-container,
+            .quiz-header {
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+            }
+        
+            #question-text {
+                width: 100%;
+                display: block;
+                word-break: break-word;
+                box-sizing: border-box;
+            }
+        
+            .option-label {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        
             /* Gamifikasi dalam bar */
             .gamification-panel {
                 display: flex;
@@ -635,38 +665,39 @@
                 gap: 1px;
                 flex: 1;
                 background: transparent;
+                max-width: 100%;
             }
-
+        
             .stats-row {
                 display: flex;
                 justify-content: flex-start;
                 width: 100%;
                 gap: 5px;
             }
-
+        
             .level-badge {
                 font-size: 1rem;
             }
-
+        
             .streak-badge {
                 font-size: 1rem;
             }
-
+        
             .xp-wrapper {
                 width: 100%;
                 margin: 0;
                 display: flex;
                 flex-direction: row;
                 align-items: center;
+                gap: 8px;
             }
-
+        
             .xp-container {
                 height: 12px;
-                width: 62%;
-                flex-shrink: 0;
+                flex: 1; /* biar fleksibel, tidak overflow */
                 margin-left: 5px;
             }
-
+        
             .xp-text {
                 display: block;
                 font-size: 0.9rem;
@@ -674,29 +705,29 @@
                 white-space: nowrap;
                 color: var(--text-muted);
             }
-
+        
             .btn-end {
                 width: auto;
                 padding: 12px 12px;
                 font-size: 0.85rem;
                 border-bottom-width: 2px;
             }
-
+        
             .btn-end:active {
                 transform: translateY(2px);
                 border-bottom-width: 0 !important;
                 margin-top: 2px;
             }
-
+        
             #question-text {
                 font-size: 1.1rem;
             }
-
+        
             .option-label {
                 padding: 14px 16px;
                 font-size: 1rem;
             }
-
+        
             .action-area {
                 position: fixed;
                 bottom: 0;
@@ -708,8 +739,9 @@
                 z-index: 50;
                 display: flex;
                 align-items: center;
+                box-sizing: border-box;
             }
-
+        
             .action-area button {
                 margin: 0;
             }
