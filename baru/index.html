@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Audit Soal SKD</title>
+    <style>
+        /* ==========================================
+           BASE STYLING
+           ========================================== */
+        html {
+            scroll-behavior: smooth; /* Efek meluncur halus saat klik navigasi */
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        /* ==========================================
+           LAYOUT: 2 KOLOM (Kiri Konten, Kanan Navigasi)
+           ========================================== */
+        .layout-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 280px; /* Konten fleksibel, Sidebar statis 280px */
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        /* Area Kiri (Daftar Soal Lengkap) */
+        .main-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Area Kanan (Sidebar Daftar Isi) */
+        .sidebar-nav {
+            position: sticky;
+            top: 20px; /* Jarak dari atas layar saat discroll */
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            max-height: calc(100vh - 40px); /* Batas tinggi maksimal */
+            overflow-y: auto; /* Munculkan scroll internal jika list terlalu panjang */
+        }
+
+        /* ==========================================
+           STYLING KONTEN SOAL
+           ========================================== */
+        h1 { margin-top: 0; color: #1a73e8; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px; }
+        
+        .kategori-section {
+            margin-bottom: 50px;
+            padding-top: 20px; /* Memberi ruang agar judul tidak tertutup batas atas layar saat discroll */
+        }
+        .kategori-judul {
+            background: #1e293b;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        
+        .soal-box {
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #1a73e8;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            background-color: #fafafa;
+        }
+        .teks-soal { font-weight: 600; margin: 0 0 15px 0; font-size: 1.05rem; line-height: 1.5; }
+        .opsi-item { margin: 8px 0; padding-left: 15px; }
+
+        /* Pewarnaan Poin Opsi */
+        .poin-5 { color: #166534; font-weight: bold; background: #dcfce7; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+        .poin-0 { color: #991b1b; font-weight: bold; background: #fee2e2; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+        .poin-mid { color: #9a3412; font-weight: bold; background: #ffedd5; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+        
+        .error-text { color: #dc2626; font-style: italic; }
+
+        /* ==========================================
+           STYLING PEMBAHASAN
+           ========================================== */
+        .pembahasan-box {
+            margin-top: 14px;
+            padding: 12px 16px;
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #1e3a5f;
+        }
+        .pembahasan-label {
+            display: block;
+            font-weight: 700;
+            color: #1d4ed8;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .pembahasan-missing {
+            margin-top: 14px;
+            padding: 10px 16px;
+            background: #fff7ed;
+            border-left: 4px solid #f97316;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: #9a3412;
+            font-style: italic;
+        }
+
+        /* ==========================================
+           STYLING SIDEBAR (DAFTAR ISI)
+           ========================================== */
+        .sidebar-nav h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .nav-group { margin-bottom: 15px; }
+        .nav-group-title { font-weight: bold; color: #1a73e8; margin-bottom: 5px; font-size: 0.95rem; }
+        
+        .nav-link {
+            display: block;
+            text-decoration: none;
+            color: #555;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+            transition: background 0.2s;
+        }
+        .nav-link:hover { background: #eef2f6; color: #1a73e8; font-weight: 600; }
+
+        /* Scrollbar kustom untuk sidebar agar rapi */
+        .sidebar-nav::-webkit-scrollbar { width: 6px; }
+        .sidebar-nav::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .sidebar-nav::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body>
+
+    <div class="layout-wrapper">
+        <!-- KOLOM KIRI: AREA RENDER SOAL -->
+        <main class="main-content">
+            <h1>🔍 Dashboard Audit Poin Jawaban</h1>
+            <div id="output-soal">
+                <!-- Data akan dimuat oleh JS -->
+            </div>
+        </main>
+
+        <!-- KOLOM KANAN: NAVIGATION PANE (DAFTAR ISI) -->
+        <aside class="sidebar-nav">
+            <h3>Daftar Sub Tes</h3>
+            <div id="nav-pane">
+                <!-- Link navigasi akan dimuat oleh JS -->
+            </div>
+        </aside>
+    </div>
+
+    <!-- Panggil File Database SOAL (Pastikan berada di folder yang sama) -->
+    <script src="Numerik.js"></script>
+    <script src="tiu2_db.js"></script>
+    <script src="tkp2_db.js"></script>
+
+    <!-- Panggil File Database PEMBAHASAN (sesuaikan nama file sesuai milikmu) -->
+    <script src="Numerik_ans.js"></script>
+    <script src="tiu2_ans.js"></script>
+    <script src="tkp2_ans.js"></script>
+
+    <script>
+        // Fungsi aman menggunakan try-catch & switch persis seperti versi dropdown
+        function getSafeData(id) {
+            try {
+                switch(id) {
+                    // TWK
+                    case "twk-nas": return twk_Nasionalisme;
+                    case "twk-int": return twk_Integritas;
+                    case "twk-bela": return twk_BelaNegara;
+                    case "twk-panca": return twk_Pancasila;
+                    case "twk-bhin": return twk_Bhineka;
+                    case "twk-nkri": return twk_NKRI;
+                    case "twk-uud": return twk_UUD1945;
+                    case "twk-indo": return twk_BahasaIndo;
+                    // TIU
+                    case "tiu-ana": return tiu_Analogis;
+                    case "tiu-sil": return tiu_Silogisme;
+                    case "tiu-analitis": return tiu_Analitis;
+                    case "tiu-deret": return tiu_Deret;
+                    case "tiu-num": return tiu_Numerik;
+                    // TKP
+                    case "tkp-pel": return tkp_PelayananPublik;
+                    case "tkp-jej": return tkp_JejaringKerja;
+                    case "tkp-sos": return tkp_SosialBudaya;
+                    case "tkp-tik": return tkp_TIK;
+                    case "tkp-prof": return tkp_Profesionalisme;
+                    case "tkp-anti": return tkp_Antiradikalisme;
+                    default: return null;
+                }
+            } catch(e) {
+                return null; // Abaikan error jika variabel benar-benar belum dibuat
+            }
+        }
+
+        // Fungsi aman untuk mengambil data PEMBAHASAN.
+        // Konvensi nama variabel: <namaVarSoal>_ans, isinya array [{ id: "...", text: "..." }, ...]
+        function getSafeAnsData(id) {
+            try {
+                switch(id) {
+                    // TWK
+                    case "twk-nas": return twk_Nasionalisme_ans;
+                    case "twk-int": return twk_Integritas_ans;
+                    case "twk-bela": return twk_BelaNegara_ans;
+                    case "twk-panca": return twk_Pancasila_ans;
+                    case "twk-bhin": return twk_Bhineka_ans;
+                    case "twk-nkri": return twk_NKRI_ans;
+                    case "twk-uud": return twk_UUD1945_ans;
+                    case "twk-indo": return twk_BahasaIndo_ans;
+                    // TIU
+                    case "tiu-ana": return tiu_Analogis_ans;
+                    case "tiu-sil": return tiu_Silogisme_ans;
+                    case "tiu-analitis": return tiu_Analitis_ans;
+                    case "tiu-deret": return tiu_Deret_ans;
+                    case "tiu-num": return tiu_Numerik_ans;
+                    // TKP
+                    case "tkp-pel": return tkp_PelayananPublik_ans;
+                    case "tkp-jej": return tkp_JejaringKerja_ans;
+                    case "tkp-sos": return tkp_SosialBudaya_ans;
+                    case "tkp-tik": return tkp_TIK_ans;
+                    case "tkp-prof": return tkp_Profesionalisme_ans;
+                    case "tkp-anti": return tkp_Antiradikalisme_ans;
+                    default: return null;
+                }
+            } catch(e) {
+                return null; // Abaikan error jika file/variabel ans belum dibuat
+            }
+        }
+
+        // Definisi Struktur Database untuk Audit
+        const daftarAudit = [
+            // TWK
+            { grup: "TWK", judul: "Nasionalisme", id: "twk-nas", varName: "twk_Nasionalisme" },
+            { grup: "TWK", judul: "Integritas", id: "twk-int", varName: "twk_Integritas" },
+            { grup: "TWK", judul: "Bela Negara", id: "twk-bela", varName: "twk_BelaNegara" },
+            { grup: "TWK", judul: "Pancasila", id: "twk-panca", varName: "twk_Pancasila" },
+            { grup: "TWK", judul: "Bhineka Tunggal Ika", id: "twk-bhin", varName: "twk_Bhineka" },
+            { grup: "TWK", judul: "NKRI", id: "twk-nkri", varName: "twk_NKRI" },
+            { grup: "TWK", judul: "UUD 1945", id: "twk-uud", varName: "twk_UUD1945" },
+            { grup: "TWK", judul: "Bahasa Indonesia", id: "twk-indo", varName: "twk_BahasaIndo" },
+
+            // TIU
+            { grup: "TIU", judul: "Analogis", id: "tiu-ana", varName: "tiu_Analogis" },
+            { grup: "TIU", judul: "Silogisme", id: "tiu-sil", varName: "tiu_Silogisme" },
+            { grup: "TIU", judul: "Analitis", id: "tiu-analitis", varName: "tiu_Analitis" },
+            { grup: "TIU", judul: "Deret", id: "tiu-deret", varName: "tiu_Deret" },
+            { grup: "TIU", judul: "Numerik", id: "tiu-num", varName: "tiu_Numerik" },
+
+            // TKP
+            { grup: "TKP", judul: "Pelayanan Publik", id: "tkp-pel", varName: "tkp_PelayananPublik" },
+            { grup: "TKP", judul: "Jejaring Kerja", id: "tkp-jej", varName: "tkp_JejaringKerja" },
+            { grup: "TKP", judul: "Sosial Budaya", id: "tkp-sos", varName: "tkp_SosialBudaya" },
+            { grup: "TKP", judul: "TIK", id: "tkp-tik", varName: "tkp_TIK" },
+            { grup: "TKP", judul: "Profesionalisme", id: "tkp-prof", varName: "tkp_Profesionalisme" },
+            { grup: "TKP", judul: "Antiradikalisme", id: "tkp-anti", varName: "tkp_Antiradikalisme" }
+        ];
+
+        const abjadList = ['A', 'B', 'C', 'D', 'E'];
+
+        function renderDashboard() {
+            const outputArea = document.getElementById('output-soal');
+            const navPane = document.getElementById('nav-pane');
+            
+            let htmlSoal = '';
+            let htmlNav = '';
+            let currentGroup = '';
+
+            daftarAudit.forEach(topik => {
+                // Menggunakan ID sebagai patokan switch-case
+                const dataSoal = getSafeData(topik.id);
+                const jumlahSoal = dataSoal ? dataSoal.length : 0;
+
+                // Bangun lookup table pembahasan berdasarkan id soal
+                const dataAns = getSafeAnsData(topik.id);
+                const ansMap = {};
+                if (dataAns && Array.isArray(dataAns)) {
+                    dataAns.forEach(item => {
+                        ansMap[item.id] = item.text;
+                    });
+                }
+
+                // --- 1. RENDER NAVIGASI KANAN ---
+                if (topik.grup !== currentGroup) {
+                    if (currentGroup !== '') htmlNav += `</div>`; 
+                    htmlNav += `<div class="nav-group">
+                                    <div class="nav-group-title">${topik.grup}</div>`;
+                    currentGroup = topik.grup;
+                }
+                
+                htmlNav += `<a href="#${topik.id}" class="nav-link">
+                                ${topik.judul} <span style="color:#aaa; font-size:0.8em">(${jumlahSoal})</span>
+                            </a>`;
+
+                // --- 2. RENDER KONTEN KIRI ---
+                htmlSoal += `<div id="${topik.id}" class="kategori-section">`;
+                htmlSoal += `<div class="kategori-judul">${topik.grup} - ${topik.judul} (Total: ${jumlahSoal} Soal)</div>`;
+
+                if (!dataSoal || dataSoal.length === 0) {
+                    htmlSoal += `<p class="error-text">⚠️ Data belum dimasukkan ke dalam variabel JS <b>${topik.varName}</b>.</p>`;
+                } else {
+                    dataSoal.forEach((soal, indexSoal) => {
+                        htmlSoal += `<div class="soal-box">`;
+                        htmlSoal += `<p class="teks-soal">${indexSoal + 1}. ${soal.text}</p>`;
+                        
+                        soal.options.forEach((opt, indexOpsi) => {
+                            const abjad = abjadList[indexOpsi] || '-';
+                            
+                            let kelasWarna = 'poin-mid';
+                            if (opt.val === 5) kelasWarna = 'poin-5';
+                            else if (opt.val === 0) kelasWarna = 'poin-0';
+
+                            htmlSoal += `<div class="opsi-item">
+                                            ${abjad}. ${opt.text} <span class="${kelasWarna}">(+${opt.val})</span>
+                                         </div>`;
+                        });
+
+                        // --- 3. RENDER PEMBAHASAN (berdasarkan soal.id) ---
+                        const pembahasan = soal.id ? ansMap[soal.id] : undefined;
+                        if (pembahasan) {
+                            htmlSoal += `<div class="pembahasan-box">
+                                            <span class="pembahasan-label">📖 Pembahasan</span>
+                                            ${pembahasan}
+                                          </div>`;
+                        } else {
+                            const idLabel = soal.id ? soal.id : '(tanpa id)';
+                            htmlSoal += `<div class="pembahasan-missing">
+                                            ⚠️ Pembahasan untuk ID <b>${idLabel}</b> belum tersedia.
+                                          </div>`;
+                        }
+
+                        htmlSoal += `</div>`;
+                    });
+                }
+                htmlSoal += `</div>`; 
+            });
+
+            htmlNav += `</div>`; 
+
+            outputArea.innerHTML = htmlSoal;
+            navPane.innerHTML = htmlNav;
+        }
+
+        document.addEventListener('DOMContentLoaded', renderDashboard);
+    </script>
+
+    </html>
